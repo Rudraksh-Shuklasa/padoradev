@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
@@ -8,62 +9,50 @@ import 'package:padora/auth/login/block/validator_login.dart';
 import 'package:padora/utils/constants/route_constansts.dart';
 import 'package:padora/utils/navigation.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginBlock extends Object with ValidatorLogin implements BaseBloc{
-
+class LoginBlock extends Object with ValidatorLogin implements BaseBloc {
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLogged = false;
   FirebaseUser myUser;
   final _email = BehaviorSubject<String>();
   final _password = BehaviorSubject<String>();
 
-
   final GoogleSignIn googleSignIn = GoogleSignIn();
+  static final FacebookLogin facebookSignIn = new FacebookLogin();
 
   Stream<String> get emailStream => _email.stream.transform(validateEmail);
-  Stream<String> get passwordStream => _password.stream.transform(validatePassword);
-  Stream<bool>   get submitValue =>  Observable.combineLatest2(emailStream, passwordStream, (a, b)=> true);
+
+  Stream<String> get passwordStream =>
+      _password.stream.transform(validatePassword);
+
+  Stream<bool> get submitValue =>
+      Observable.combineLatest2(emailStream, passwordStream, (a, b) => true);
 
   Function(String) get ChangeEmail => _email.sink.add;
-  Function(String) get ChangePassword => _password.sink.add;
 
+  Function(String) get ChangePassword => _password.sink.add;
 
   String name;
   String email;
   String imageUrl;
 
-  submitLogin(BuildContext context){
+  submitLogin(BuildContext context) {
     NavigationUtils.push(context, ROUTE_REGISTER);
   }
 
-  Future<int> handleSignIn( ) async {
-
-        FacebookLoginResult facebookLoginResult = await _handleFBSignIn();
-        final accessToken = facebookLoginResult.accessToken.toString();
-        if (facebookLoginResult.status == FacebookLoginStatus.loggedIn) {
-          final facebookAuthCred =
-          FacebookAuthProvider.getCredential(accessToken: accessToken);
-          final user =
-          await _auth.signInWithCredential(facebookAuthCred);
-          print("User : " + user.toString());
-          return 1;
-        } else
-          return 0;
 
 
-  }
 
   Future<FacebookLoginResult> _handleFBSignIn() async {
     FacebookLogin facebookLogin = FacebookLogin();
     FacebookLoginResult facebookLoginResult =
-    await facebookLogin.logInWithReadPermissions(['email']);
+        await facebookLogin.logIn(['email']);
     switch (facebookLoginResult.status) {
       case FacebookLoginStatus.cancelledByUser:
         print("Cancelled");
         break;
       case FacebookLoginStatus.error:
-        print(FacebookLoginStatus.error);
+        print("error");
         break;
       case FacebookLoginStatus.loggedIn:
         print("Logged In");
@@ -72,11 +61,21 @@ class LoginBlock extends Object with ValidatorLogin implements BaseBloc{
     return facebookLoginResult;
   }
 
+  Future<FirebaseUser> facebookLogin() async {
+    FacebookLoginResult facebookLoginResult = await _handleFBSignIn();
+    final accessToken = facebookLoginResult.accessToken.token;
+    if (facebookLoginResult.status == FacebookLoginStatus.loggedIn) {
+      final facebookAuthCred =
+          FacebookAuthProvider.getCredential(accessToken: accessToken);
+      final firebaseAuth = await _auth.signInWithCredential(facebookAuthCred);
+      return firebaseAuth.user;
+    }
+  }
 
   Future<String> signInWithGoogle() async {
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
-    await googleSignInAccount.authentication;
+        await googleSignInAccount.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleSignInAuthentication.accessToken,
@@ -107,9 +106,6 @@ class LoginBlock extends Object with ValidatorLogin implements BaseBloc{
     _email.close();
     _password.close();
   }
-
-
-
 }
 
 abstract class BaseBloc {
