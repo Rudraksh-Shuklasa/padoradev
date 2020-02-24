@@ -24,7 +24,7 @@ class _QuickSearchItemState extends State<QuickSearchItem> {
               width: 48,
               decoration: new BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey,
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey,

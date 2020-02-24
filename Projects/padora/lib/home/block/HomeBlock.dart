@@ -5,6 +5,14 @@ import 'package:rxdart/rxdart.dart';
 class HomeBlock  {
   final listBlock = BehaviorSubject<List<DemoCart>>();
 
+  final listSearchItem=BehaviorSubject<int>();
+
+
+  Stream<int> get listSearchItemStream => listSearchItem.stream;
+
+
+
+  Function(int) get listSearchItemSink => listSearchItem.sink.add;
 
 
   Stream<List<DemoCart>> get listBlockStream => listBlock.stream;

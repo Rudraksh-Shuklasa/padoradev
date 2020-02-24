@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:padora/home/screens/man/man_screen.dart';
 import 'package:padora/utils/constants/image_constansts.dart';
+import 'package:padora/utils/constants/route_constansts.dart';
+import 'package:padora/utils/navigation.dart';
 
 import 'block/HomeBlock.dart';
 
@@ -34,70 +36,79 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              "PADORA",
-              style: GoogleFonts.pTSerifCaption(
-                textStyle: TextStyle(color: Colors.black, fontSize: 18),
-              ),
-            ),
-          ),
-          bottom:  TabBar(
-            unselectedLabelColor: Colors.white,
-            labelColor: Colors.black,
-
-            tabs: [
-              new Tab(
-                child: Text("MALE",style: TextStyle(color: Colors.black),
+    return MaterialApp(
+      home: Scaffold(
+          resizeToAvoidBottomPadding: false,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                "PADORA",
+                style: GoogleFonts.pTSerifCaption(
+                  textStyle: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ),
-              new Tab(
-                child: Text("FEMALE",style: TextStyle(color: Colors.black)),
-              ),
-            ],
-            controller: _tabController,
-            indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(width: 3.0),
-                insets: EdgeInsets.symmetric(horizontal:8.0)
             ),
-            indicatorWeight: 3,
-            indicatorSize: TabBarIndicatorSize.tab,
-          ),
-          actions: <Widget>[
-            Row(
-              children: <Widget>[
-                IconButton(
-                  icon: Image.asset(
-                    IC_SERACH,
-                    scale: 4,
+            bottom:  TabBar(
+              unselectedLabelColor: Colors.white,
+              labelColor: Colors.black,
+              tabs: [
+                new Tab(
+                  child: Text("MALE",style: TextStyle(color: Colors.black),
                   ),
-                  onPressed: () => {},
                 ),
-                IconButton(
-                    icon: Image.asset(
-                      IC_CART,
-                      scale: 4,
-                    ),
-                    onPressed: () {
-                      print('Click start');
-                    }),
+                new Tab(
+                  child: Text("FEMALE",style: TextStyle(color: Colors.black)),
+                ),
               ],
-            )
-          ],
-        ),
-        body: TabBarView(
-                children: [
-                   ManScreen(),
-                   Text("This is chat Tab View"),
+              controller: _tabController,
+              indicator: UnderlineTabIndicator(
+                  borderSide: BorderSide(width: 3.0),
+                  insets: EdgeInsets.symmetric(horizontal:8.0)
+              ),
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.tab,
+            ),
+            actions: <Widget>[
+              Row(
+                children: <Widget>[
+
+                  Hero(
+                    tag: "search",
+
+                    child: IconButton(
+                      icon: Image.asset(
+                        IC_SERACH,
+                        scale: 4,
+                      ),
+                      onPressed: () => {
+                        NavigationUtils.push(context, ROUTE_SEARCH)
+
+                      },
+                    ),
+                  ),
+                  IconButton(
+                      icon: Image.asset(
+                        IC_CART,
+                        scale: 4,
+                      ),
+                      onPressed: () {
+                        print('Click start');
+                      }),
                 ],
-                controller: _tabController,
               )
+            ],
+          ),
+          body: TabBarView(
+                  children: [
+                     ManScreen(),
+                     Text("This is chat Tab View"),
+                  ],
+            controller: _tabController,
+                )
+      ),
     );
 
   }
